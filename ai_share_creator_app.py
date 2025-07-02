@@ -123,7 +123,7 @@ def generate_share_url(platform: str, prompt: str) -> str:
     encoded_prompt = urllib.parse.quote(prompt)
     return config["base_url"] + encoded_prompt
 
-def generate_markdown_code(urls: Dict[str, str], brand: str = "", topic: str = "") -> str:
+def generate_markdown_code(urls: Dict[str, str], brand: str = "", topic: str = "", custom_prompt: str = "") -> str:
     """Generate markdown code for the share buttons with GA4 tracking."""
     if not urls:
         return ""
@@ -143,8 +143,11 @@ def generate_markdown_code(urls: Dict[str, str], brand: str = "", topic: str = "
         link = f'<a href="{url}" target="_blank" rel="noopener" class="{combined_class}">{config["icon"]} {config["name"]} </a>'
         links.append(link)
     
+    # Use consistent call-to-action text
+    call_to_action = "Summarize and analyze this article with"
+    
     # Join with "or" and create the blockquote format
-    markdown_text = f"> Summarize and analyze this article with 👉 {' or '.join(links)}."
+    markdown_text = f"> {call_to_action} 👉 {' or '.join(links)}."
     
     return markdown_text
 
@@ -249,7 +252,7 @@ def main():
                     st.session_state.generated_urls[platform] = url
                 
                 # Generate markdown code
-                st.session_state.generated_markdown = generate_markdown_code(st.session_state.generated_urls, brand_name, topic)
+                st.session_state.generated_markdown = generate_markdown_code(st.session_state.generated_urls, brand_name, topic, custom_prompt)
                 
                 st.success("✅ AI Share URLs generated successfully!")
             else:
@@ -262,7 +265,7 @@ def main():
         2. **Select AI platforms** you want to target
         3. **Customize the prompt** or use templates
         4. **Generate URLs** that pre-populate AI chats
-        5. **Copy and use** the generated links or HTML code
+        5. **Copy and use** the generated links or Markdown code
         """)
         
         if st.session_state.get("generated_urls"):
