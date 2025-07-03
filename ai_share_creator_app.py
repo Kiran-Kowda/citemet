@@ -133,14 +133,14 @@ def generate_markdown_code(urls: Dict[str, str], brand: str = "", topic: str = "
     for platform, url in urls.items():
         config = PLATFORM_CONFIGS[platform]
         
-        # Create combined GA4 class name (click ID method)
+        # Create specific tracking ID
         safe_topic = topic.lower().replace(' ', '-').replace('&', 'and') if topic else 'general'
-        # Use "google-aim" for Google platform in GA4 class
+        # Use "google-aim" for Google platform in tracking ID
         platform_name = "google-aim" if platform == "google" else platform
-        combined_class = f"send-ga-event ai-share-click-{platform_name}-{safe_topic}"
+        tracking_id = f"ai-share-click-{platform_name}-{safe_topic}"
         
-        # Create link with combined GA4 tracking class
-        link = f'<a href="{url}" target="_blank" rel="noopener" class="{combined_class}">{config["icon"]} {config["name"]} </a>'
+        # Create link with separate class and ID for GA4 tracking
+        link = f'<a href="{url}" target="_blank" rel="noopener" class="send-ga-event" id="{tracking_id}">{config["icon"]} {config["name"]} </a>'
         links.append(link)
     
     # Use consistent call-to-action text
@@ -304,13 +304,18 @@ def main():
         with st.expander("📊 GA4 Tracking Details"):
             st.markdown("""
             **Your links include GA4 event tracking:**
-            - **Combined CSS Class:** `send-ga-event ai-share-click-{platform}-{topic}`
+            - **CSS Class:** `send-ga-event` (for general event handling)
+            - **ID Attribute:** `ai-share-click-{platform}-{topic}` (for specific tracking)
             
-            **Example class:** `send-ga-event ai-share-click-chatgpt-data-governance`
+            **Example:**
+            ```html
+            <a class="send-ga-event" id="ai-share-click-chatgpt-data-governance">
+            ```
             
             **Setup GA4 Event Tracking:**
-            1. Add this JavaScript to your site to listen for clicks on these classes
-            2. Set up custom events in GA4 to track button performance
+            1. Add JavaScript to listen for clicks on `.send-ga-event` class
+            2. Use the `id` attribute to identify which specific button was clicked
+            3. Set up custom events in GA4 to track button performance
             
             **In GA4, you can track:**
             - Which AI platforms get the most clicks
